@@ -1,0 +1,427 @@
+@import "tailwindcss";
+
+/* ─── Google Font via HTML link tag in layout.tsx ─────────────────────── */
+
+/* ════════════════════════════════════════════
+   DARK TOKENS  (default)
+════════════════════════════════════════════ */
+:root {
+  --bg:            #07071a;
+  --surface:       #0e0e26;
+  --surface2:      #141432;
+  --border:        rgba(130,80,255,0.18);
+
+  --text:          #e8e8f4;
+  --dim:           #8888aa;
+  --muted:         #55556a;
+
+  --accent:        #7c3aed;
+  --accent2:       #a855f7;
+
+  /* glass */
+  --glass:         rgba(10,10,30,0.72);
+
+  /* nav when scrolled */
+  --nav-bg:        rgba(7,7,26,0.88);
+  --nav-border:    rgba(130,80,255,0.14);
+
+  /* chat bubbles */
+  --user-bg:       linear-gradient(135deg,#6d28d9,#9333ea);
+  --user-text:     #fff;
+  --agent-bg:      rgba(16,16,38,0.92);
+  --agent-border:  rgba(110,70,240,0.22);
+  --agent-text:    var(--text);
+  --agent-strong:  #c084fc;
+  --agent-h3:      #a5b4fc;
+  --agent-code-bg: rgba(120,50,220,0.18);
+  --agent-code:    #c084fc;
+
+  /* input */
+  --input-bg:      rgba(255,255,255,0.04);
+  --input-border:  rgba(130,80,255,0.24);
+
+  /* sidebar */
+  --sidebar-bg:    rgba(6,6,18,0.96);
+  --sidebar-border:rgba(130,80,255,0.1);
+
+  /* kbd */
+  --kbd-bg:        rgba(255,255,255,0.07);
+  --kbd-border:    rgba(255,255,255,0.14);
+
+  /* toggle */
+  --toggle-bg:     rgba(255,255,255,0.07);
+  --toggle-hover:  rgba(255,255,255,0.14);
+  --toggle-border: rgba(255,255,255,0.12);
+
+  /* icon buttons */
+  --icon-bg:       rgba(255,255,255,0.06);
+  --icon-border:   rgba(255,255,255,0.1);
+  --icon-hover:    rgba(255,255,255,0.13);
+
+  /* divider */
+  --divider:       rgba(130,80,255,0.1);
+
+  /* blobs */
+  --blob1a: rgba(90,40,220,0.52);
+  --blob1b: rgba(70,110,240,0.2);
+  --blob2a: rgba(120,60,255,0.42);
+  --blob2b: rgba(90,150,255,0.16);
+
+  /* grid line */
+  --grid: rgba(130,80,255,0.045);
+}
+
+/* ════════════════════════════════════════════
+   LIGHT TOKENS
+════════════════════════════════════════════ */
+[data-theme="light"] {
+  --bg:            #f2f0fb;
+  --surface:       #e8e5f8;
+  --surface2:      #dddaf4;
+  --border:        rgba(100,60,200,0.2);
+
+  --text:          #1a1730;
+  --dim:           #4a4770;
+  --muted:         #7878a8;
+
+  --accent:        #6d28d9;
+  --accent2:       #7c3aed;
+
+  --glass:         rgba(242,240,251,0.8);
+
+  --nav-bg:        rgba(242,240,251,0.9);
+  --nav-border:    rgba(100,60,200,0.18);
+
+  --user-bg:       linear-gradient(135deg,#5b21b6,#7c3aed);
+  --user-text:     #fff;
+  --agent-bg:      rgba(255,255,255,0.92);
+  --agent-border:  rgba(100,60,200,0.2);
+  --agent-text:    #1a1730;
+  --agent-strong:  #6d28d9;
+  --agent-h3:      #4f46e5;
+  --agent-code-bg: rgba(100,50,180,0.1);
+  --agent-code:    #6d28d9;
+
+  --input-bg:      rgba(255,255,255,0.75);
+  --input-border:  rgba(100,60,200,0.28);
+
+  --sidebar-bg:    rgba(232,229,248,0.98);
+  --sidebar-border:rgba(100,60,200,0.14);
+
+  --kbd-bg:        rgba(0,0,0,0.06);
+  --kbd-border:    rgba(0,0,0,0.14);
+
+  --toggle-bg:     rgba(0,0,0,0.07);
+  --toggle-hover:  rgba(0,0,0,0.13);
+  --toggle-border: rgba(0,0,0,0.14);
+
+  --icon-bg:       rgba(0,0,0,0.06);
+  --icon-border:   rgba(0,0,0,0.1);
+  --icon-hover:    rgba(0,0,0,0.12);
+
+  --divider:       rgba(100,60,200,0.13);
+
+  --blob1a: rgba(130,90,255,0.18);
+  --blob1b: rgba(100,140,255,0.1);
+  --blob2a: rgba(150,100,255,0.14);
+  --blob2b: rgba(110,160,255,0.08);
+
+  --grid: rgba(100,60,200,0.055);
+}
+
+/* ════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Set bg on html so it's always visible even before JS hydrates */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg);
+  /* fallback hard-coded dark so it never flashes white */
+  background-color: #07071a;
+}
+/* Once the token is available, use the var */
+html { background-color: var(--bg); }
+
+[data-theme="light"] {
+  background-color: #f2f0fb;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background .3s, color .3s;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(124,58,237,.38); border-radius: 99px; }
+
+/* ════════════════════════════════════════════
+   KEYFRAMES
+════════════════════════════════════════════ */
+@keyframes breathe {
+  0%,100% { opacity:.6; transform:scale(1); }
+  50%      { opacity:.88; transform:scale(1.08); }
+}
+@keyframes breathe2 {
+  0%,100% { opacity:.38; transform:scale(1); }
+  50%      { opacity:.62; transform:scale(1.12); }
+}
+@keyframes twinkle {
+  0%,100% { opacity: var(--op,.2); }
+  50%      { opacity: calc(var(--op,.2) * .25); }
+}
+@keyframes slide-up {
+  from { opacity:0; transform:translateY(22px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+@keyframes bubble-in {
+  from { opacity:0; transform:scale(.93) translateY(4px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+@keyframes dot-pulse {
+  0%,80%,100% { opacity:.15; transform:scale(.75); }
+  40%          { opacity:1;   transform:scale(1); }
+}
+@keyframes blink {
+  0%,100% { opacity:1; }
+  50%      { opacity:0; }
+}
+@keyframes pan-grad {
+  0%,100% { background-position:0% 50%; }
+  50%      { background-position:100% 50%; }
+}
+@keyframes shimmer {
+  from { background-position:-200% center; }
+  to   { background-position:200% center; }
+}
+
+/* ════════════════════════════════════════════
+   UTILITIES
+════════════════════════════════════════════ */
+.su  { animation: slide-up .6s cubic-bezier(.22,1,.36,1) both; }
+.fi  { animation: fade-in .35s ease both; }
+.bi  { animation: bubble-in .28s cubic-bezier(.22,1,.36,1) both; }
+
+/* ════════════════════════════════════════════
+   GRADIENT TEXT
+════════════════════════════════════════════ */
+.g-text {
+  background: linear-gradient(110deg,#d8b4fe 0%,#818cf8 50%,#93c5fd 100%);
+  background-size: 200% auto;
+  animation: pan-grad 5s linear infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+[data-theme="light"] .g-text {
+  background: linear-gradient(110deg,#6d28d9 0%,#4f46e5 50%,#2563eb 100%);
+  background-size: 200% auto;
+  animation: pan-grad 5s linear infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ════════════════════════════════════════════
+   GLASS
+════════════════════════════════════════════ */
+.glass {
+  background: var(--glass);
+  /* Solid fallback so it never looks transparent on dark bg */
+  background: rgba(10,10,30,0.85);
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  border: 1px solid var(--border);
+  transition: background .3s, border-color .3s;
+}
+[data-theme="light"] .glass {
+  background: rgba(242,240,251,0.88);
+}
+
+/* ════════════════════════════════════════════
+   BACKGROUND BLOBS  (fixed, z-0)
+════════════════════════════════════════════ */
+.blob-1,.blob-2 {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(70px);
+  z-index: 0;
+  transition: background .4s;
+}
+.blob-1 {
+  width: clamp(380px,68vw,780px);
+  height: clamp(280px,48vw,580px);
+  top:50%; left:50%;
+  transform:translate(-50%,-52%);
+  background: radial-gradient(ellipse,var(--blob1a) 0%,var(--blob1b) 40%,transparent 72%);
+  animation: breathe 8s ease-in-out infinite;
+}
+.blob-2 {
+  width: clamp(180px,38vw,480px);
+  height: clamp(130px,28vw,330px);
+  top:45%; left:50%;
+  transform:translate(-50%,-50%);
+  background: radial-gradient(ellipse,var(--blob2a) 0%,var(--blob2b) 45%,transparent 75%);
+  animation: breathe2 6s ease-in-out infinite;
+}
+
+/* ════════════════════════════════════════════
+   GRID  (fixed, z-0)
+════════════════════════════════════════════ */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 68px 68px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%,black 15%,transparent 100%);
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%,black 15%,transparent 100%);
+}
+
+/* ════════════════════════════════════════════
+   NAV LINK
+════════════════════════════════════════════ */
+.nav-link {
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--dim);
+  padding: 4px 14px;
+  border-radius: 99px;
+  transition: color .2s, background .2s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.nav-link:hover { color:var(--text); background:rgba(130,80,255,.09); }
+
+/* ════════════════════════════════════════════
+   PILL BUTTON  (navbar CTA)
+════════════════════════════════════════════ */
+.pill-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg,#4c1d95,#6d28d9);
+  border: 1px solid rgba(130,80,255,.4);
+  transition: transform .18s, box-shadow .18s;
+  white-space: nowrap;
+  font-family: inherit;
+  letter-spacing: .01em;
+}
+.pill-btn:hover  { transform:translateY(-1px); box-shadow:0 6px 22px rgba(110,50,200,.45); }
+.pill-btn:active { transform:translateY(0); }
+.pill-btn::after {
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.08) 50%,transparent 65%);
+  background-size:200% 100%;
+  animation:shimmer 3s infinite;
+}
+
+/* ════════════════════════════════════════════
+   THEME TOGGLE
+════════════════════════════════════════════ */
+.theme-toggle {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  color: var(--dim);
+  cursor: pointer;
+  transition: background .2s, transform .18s, color .2s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--toggle-hover);
+  transform: scale(1.08);
+  color: var(--text);
+}
+
+/* ════════════════════════════════════════════
+   STATUS DOTS
+════════════════════════════════════════════ */
+.dot-live {
+  display:inline-block; width:7px; height:7px;
+  border-radius:50%; background:#22c55e;
+  box-shadow:0 0 6px #22c55e; flex-shrink:0;
+}
+.dot-busy {
+  display:inline-block; width:7px; height:7px;
+  border-radius:50%; background:#f59e0b;
+  box-shadow:0 0 6px #f59e0b; flex-shrink:0;
+}
+
+/* ════════════════════════════════════════════
+   CHAT BUBBLES
+════════════════════════════════════════════ */
+.bub-u {
+  align-self: flex-end;
+  background: var(--user-bg);
+  color: var(--user-text);
+  border-radius: 18px 18px 4px 18px;
+  padding: 9px 14px;
+  max-width: 82%;
+  font-size: .875rem;
+  line-height: 1.56;
+  word-break: break-word;
+  box-shadow: 0 4px 14px rgba(110,40,200,.3);
+  animation: bubble-in .28s cubic-bezier(.22,1,.36,1) both;
+}
+.bub-a {
+  align-self: flex-start;
+  background: var(--agent-bg);
+  border: 1px solid var(--agent-border);
+  color: var(--agent-text);
+  border-radius: 18px 18px 18px 4px;
+  padding: 9px 14px;
+  max-width: 82%;
+  font-size: .875rem;
+  line-height: 1.56;
+  word-break: break-word;
+  animation: bubble-in .28s cubic-bezier(.22,1,.36,1) both;
+}
+.bub-a strong { color: var(--agent-strong); }
+.bub-a h3 { color: var(--agent-h3); font-size:.92em; font-weight:600; margin:6px 0 3px; }
+.bub-a code {
+  background: var(--agent-code-bg);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: .82em;
+  color: var(--agent-code);
+  font-family: 'Fira Code','Fira Mono',monospace;
+}
+
+/* ════════════════════════════════════════════
+   TYPING DOTS
+════════════════════════════════════════════ */
+.typing { display:flex; gap:4px; align-items:center; padding:2px 0; }
+.typing span {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--accent2);
+  animation: dot-pulse 1.2s ease-in-out infinite;
+}
+.typing span:nth-child(2) { animation-delay:.2s; }
+.typing span:nth-child(3) { animation-delay:.4s; }

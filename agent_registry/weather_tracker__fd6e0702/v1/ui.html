@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Tracker Assistant</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --bg:        #f8fafc;
+      --surface:   #ffffff;
+      --border:    #e2e8f0;
+      --user-bg:   #2563eb;
+      --agent-bg:  #f1f5f9;
+      --text:      #1e293b;
+      --muted:     #94a3b8;
+      --accent:    #2563eb;
+      --error:     #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 780px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+    }
+
+    .header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+    }
+
+    .header .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    .header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .chat-window {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── Bubbles ── */
+    .bubble {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      line-height: 1.6;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .bubble.user {
+      background: var(--user-bg);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+      white-space: pre-wrap; /* plain text – preserve newlines */
+    }
+
+    .bubble.agent {
+      background: var(--agent-bg);
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--border);
+      white-space: normal;   /* markdown renders its own structure */
+      max-width: 90%;        /* wider for tables / long content */
+      overflow-x: auto;
+    }
+
+    .bubble .timestamp {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    /* ── Markdown element styles inside agent bubble ── */
+    .bubble.agent h1,
+    .bubble.agent h2,
+    .bubble.agent h3,
+    .bubble.agent h4 {
+      margin: 12px 0 6px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .bubble.agent h1 { font-size: 1.25em; }
+    .bubble.agent h2 { font-size: 1.1em; }
+    .bubble.agent h3 { font-size: 1em; }
+
+    .bubble.agent p {
+      margin: 6px 0;
+    }
+
+    .bubble.agent ul,
+    .bubble.agent ol {
+      padding-left: 22px;
+      margin: 6px 0;
+    }
+
+    .bubble.agent li {
+      margin: 3px 0;
+    }
+
+    .bubble.agent strong { font-weight: 700; }
+    .bubble.agent em     { font-style: italic; }
+
+    .bubble.agent code {
+      background: #e2e8f0;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    .bubble.agent pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      overflow-x: auto;
+      margin: 8px 0;
+    }
+
+    .bubble.agent pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: 13px;
+    }
+
+    /* ── Tables ── */
+    .bubble.agent table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    .bubble.agent th,
+    .bubble.agent td {
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      text-align: left;
+    }
+
+    .bubble.agent th {
+      background: #e2e8f0;
+      font-weight: 700;
+    }
+
+    .bubble.agent tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    /* ── Blockquote ── */
+    .bubble.agent blockquote {
+      border-left: 3px solid var(--accent);
+      margin: 8px 0;
+      padding: 4px 12px;
+      color: #475569;
+      font-style: italic;
+    }
+
+    /* ── Horizontal rule ── */
+    .bubble.agent hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 10px 0;
+    }
+
+    /* ── Links ── */
+    .bubble.agent a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    /* ── Input row ── */
+    .input-row {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      background: var(--surface);
+    }
+
+    textarea {
+      flex: 1;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      padding: 10px 14px;
+      resize: none;
+      height: 44px;
+      max-height: 120px;
+      overflow-y: auto;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus { border-color: var(--accent); }
+
+    button#sendBtn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      height: 44px;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    button#sendBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .spinner {
+      display: none;
+      align-self: flex-start;
+      padding: 10px 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .spinner.visible { display: block; }
+
+    .error-msg {
+      color: var(--error);
+      font-size: 13px;
+      padding: 8px 14px;
+      align-self: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="dot"></div>
+      <h1>Weather Tracker Assistant</h1>
+    </div>
+    <div class="chat-window" id="chatWindow">
+      <div class="bubble agent">
+        Hi! I am your Weather Tracker Assistant. I can help you find current weather information. What city are you interested in?
+        <div class="timestamp">now</div>
+      </div>
+    </div>
+    <div class="spinner" id="spinner">Agent is thinking...</div>
+    <div class="input-row">
+      <textarea id="userInput" placeholder="Type a message... (Enter to send)"></textarea>
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script>
+    // Configure marked: safe defaults
+    marked.setOptions({
+      breaks: true,      // single newline → <br> (friendlier for chat)
+      gfm: true,         // GitHub Flavoured Markdown (tables, strikethrough, etc.)
+    });
+
+    const chatWindow = document.getElementById('chatWindow');
+    const textarea   = document.getElementById('userInput');
+    const sendBtn    = document.getElementById('sendBtn');
+    const spinner    = document.getElementById('spinner');
+
+    function addBubble(text, role) {
+      const div = document.createElement('div');
+      div.className = `bubble ${role}`;
+
+      if (role === 'agent') {
+        // Render markdown for agent replies
+        div.innerHTML = marked.parse(text || '');
+      } else {
+        // Plain text for user messages (XSS-safe)
+        div.textContent = text;
+      }
+
+      const ts = document.createElement('div');
+      ts.className = 'timestamp';
+      ts.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      div.appendChild(ts);
+
+      chatWindow.appendChild(div);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function addError(msg) {
+      const div = document.createElement('div');
+      div.className = 'error-msg';
+      div.textContent = '⚠ ' + msg;
+      chatWindow.appendChild(div);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      addBubble(text, 'user');
+      textarea.value = '';
+      textarea.style.height = '44px';
+      sendBtn.disabled = true;
+      spinner.classList.add('visible');
+
+      try {
+        const res = await fetch('http://127.0.0.1:8000/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_input: text, thread_id: 'thread-1' })
+        });
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const data = await res.json();
+        addBubble(data.assistant_reply || '(no reply)', 'agent');
+      } catch (err) {
+        addError(err.message || 'Could not reach the agent.');
+      } finally {
+        sendBtn.disabled = false;
+        spinner.classList.remove('visible');
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    textarea.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    textarea.addEventListener('input', () => {
+      textarea.style.height = '44px';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    });
+  </script>
+</body>
+</html>
