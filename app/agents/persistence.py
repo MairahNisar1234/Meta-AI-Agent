@@ -26,7 +26,7 @@ from pathlib import Path
 
 from pymongo import MongoClient, ReturnDocument
 
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
+MONGO_URI = os.environ.get("MONGO_URI", "https://meta-ai-agent-uwbi.onrender.com")
 DB_NAME = os.environ.get("META_AGENT_DB_NAME", "meta_agents")
 
 # IMPORTANT: this must NOT be the same folder your pipeline writes live agents
