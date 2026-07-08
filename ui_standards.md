@@ -73,7 +73,7 @@
       gap: 12px;
     }
 
-    /* ── Bubbles ── */
+    /* Bubbles*/
     .bubble {
       max-width: 75%;
       padding: 10px 14px;
@@ -109,7 +109,7 @@
       text-align: right;
     }
 
-    /* ── Markdown element styles inside agent bubble ── */
+    /* Markdown element styles inside agent bubble */
     .bubble.agent h1,
     .bubble.agent h2,
     .bubble.agent h3,
@@ -163,7 +163,7 @@
       font-size: 13px;
     }
 
-    /* ── Tables ── */
+    /* Tables */
     .bubble.agent table {
       border-collapse: collapse;
       width: 100%;
@@ -187,7 +187,7 @@
       background: #f8fafc;
     }
 
-    /* ── Blockquote ── */
+    /* Blockquote */
     .bubble.agent blockquote {
       border-left: 3px solid var(--accent);
       margin: 8px 0;
@@ -196,20 +196,20 @@
       font-style: italic;
     }
 
-    /* ── Horizontal rule ── */
+    /*Horizontal rule */
     .bubble.agent hr {
       border: none;
       border-top: 1px solid var(--border);
       margin: 10px 0;
     }
 
-    /* ── Links ── */
+    /* Links */
     .bubble.agent a {
       color: var(--accent);
       text-decoration: underline;
     }
 
-    /* ── Input row ── */
+    /* Input row */
     .input-row {
       padding: 16px 20px;
       border-top: 1px solid var(--border);

@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 
 
-/* ── types ───────────────────────────────────────────────────────────── */
+/*  types */
 interface AgentFile {
   name: string;
   download_url: string;
@@ -49,7 +49,7 @@ interface Agent {
   has_files: boolean;
 }
 
-/* ── helpers ─────────────────────────────────────────────────────────── */
+/* helpers */
 const AGENT_ICONS: Record<string, LucideIcon> = {
   mental_health_agent: Brain,
   mental_health_assistant: HeartHandshake,
@@ -128,7 +128,7 @@ const FILE_ICONS: Record<string, string> = {
 };
 
 
-/* ── Agent Card ──────────────────────────────────────────────────────── */
+/* Agent Card  */
 function AgentCard({ agent, onSelect }: { agent: Agent; onSelect: () => void }) {
   const color = getColor(agent.canonical_name);
   const Icon = getIcon(agent.canonical_name);
@@ -263,7 +263,7 @@ function AgentCard({ agent, onSelect }: { agent: Agent; onSelect: () => void }) 
 }
 
 
-/* ── Detail Modal ────────────────────────────────────────────────────── */
+/*  Detail Modal  */
 function AgentModal({ agent, onClose }: { agent: Agent; onClose: () => void }) {
   const color = getColor(agent.canonical_name);
   const Icon = getIcon(agent.canonical_name);
@@ -464,7 +464,7 @@ python agent.py
 }
 
 
-/* ── Page ────────────────────────────────────────────────────────────── */
+/* Page */
 export default function ExamplesPage() {
   const [agents,   setAgents]   = useState<Agent[]>([]);
   const [loading,  setLoading]  = useState(true);

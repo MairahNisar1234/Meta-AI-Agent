@@ -527,7 +527,7 @@ export default function HowItWorksPage() {
             </p>
           </div>
 
-          {/* ── STEP CARDS ───────────────────────────────────────────── */}
+          {/*  STEP CARDS  */}
           <section style={{ marginBottom: "clamp(48px,6vw,80px)" }}>
             <h2 style={{
               fontWeight: 700, fontSize: "1.1rem",
@@ -587,7 +587,7 @@ export default function HowItWorksPage() {
             </div>
           </section>
 
-          {/* ── INTERACTIVE PIPELINE ─────────────────────────────────── */}
+          {/*  INTERACTIVE PIPELINE */}
           <section style={{ marginBottom: "clamp(48px,6vw,80px)" }}>
             <h2 style={{
               fontWeight: 700, fontSize: "1.1rem",
@@ -687,7 +687,7 @@ export default function HowItWorksPage() {
             </div>
           </section>
 
-          {/* ── AGENT STATE TABLE ────────────────────────────────────── */}
+          {/*  AGENT STATE TABLE  */}
           <section style={{ marginBottom: "clamp(48px,6vw,80px)" }}>
             <h2 style={{
               fontWeight: 700, fontSize: "1.1rem",
@@ -738,7 +738,7 @@ export default function HowItWorksPage() {
             </div>
           </section>
 
-          {/* ── TECH STACK ───────────────────────────────────────────── */}
+          {/*  TECH STACK */}
          <section style={{ marginBottom: "clamp(32px,4vw,48px)" }}>
   <h2
     style={{

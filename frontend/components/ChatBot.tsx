@@ -9,7 +9,7 @@ import {
 } from "react";
 import { streamChat, type StreamEvent } from "@/lib/api";
 
-// ── Tiny markdown renderer ────────────────────────────────────────────────
+// Tiny markdown renderer
 function parseMarkdown(text: string): string {
   return text
     .replace(/^### (.+)$/gm, "<h3>$1</h3>")
@@ -19,7 +19,7 @@ function parseMarkdown(text: string): string {
     .replace(/\n/g, "<br />");
 }
 
-// ── Types ─────────────────────────────────────────────────────────────────
+//  Types 
 interface Message {
   id: string;
   role: "user" | "agent";
@@ -33,7 +33,7 @@ interface ToolEvent {
   active: boolean;
 }
 
-// ── Greeting shown on first open ──────────────────────────────────────────
+// Greeting shown on first open 
 const GREETING = `👋 Hi! I'm your **Agent Builder**.
 
 Tell me what kind of agent you want, and I'll build it for you — including the full \`agent.py\`, \`.env\`, and a \`ui.html\` frontend.
@@ -45,7 +45,7 @@ Tell me what kind of agent you want, and I'll build it for you — including the
 
 What would you like to build?`;
 
-// ── Component ─────────────────────────────────────────────────────────────
+//  Component
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -77,7 +77,7 @@ export default function ChatBot({ open, onClose }: Props) {
     if (open) setTimeout(() => inputRef.current?.focus(), 100);
   }, [open]);
 
-  // ── Send message ────────────────────────────────────────────────────────
+  //  Send message
   const send = useCallback(async () => {
     const text = input.trim();
     if (!text || busy) return;
@@ -189,7 +189,7 @@ export default function ChatBot({ open, onClose }: Props) {
     abortRef.current?.abort();
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────
+  //  Render 
   if (!open) return null;
 
   return (

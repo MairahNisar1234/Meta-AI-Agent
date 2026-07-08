@@ -6,7 +6,7 @@ import InlineChat from "@/components/InlineChat";
 import ThemeToggle from "@/components/ThemeToggle";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
-/* ── star field (client-only to avoid hydration mismatch) ─────────────── */
+/*star field (client-only to avoid hydration mismatch) */
 interface Star { x: number; y: number; s: number; op: number; d: number; dl: number; }
 
 function StarField() {
@@ -44,7 +44,7 @@ function StarField() {
   );
 }
 
-/* ── page ─────────────────────────────────────────────────────────────── */
+/* page */
 export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -57,13 +57,13 @@ export default function HomePage() {
     /* root: normal document flow — no overflow hidden, scrolls naturally */
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
 
-      {/* ── decorative bg (z-0, fixed, pointer-events none) ─────────── */}
+      {/* decorative bg (z-0, fixed, pointer-events none) */}
       <div className="blob-1" aria-hidden />
       <div className="blob-2" aria-hidden />
       <div className="grid-bg" aria-hidden />
       <StarField />
 
-      {/* ── NAVBAR ──────────────────────────────────────────────────── */}
+      {/* NAVBAR */}
       <header
         style={{
           position: "sticky",
@@ -130,7 +130,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ── HERO ────────────────────────────────────────────────────── */}
+      {/* HERO */}
       <main
         style={{
           position: "relative",
@@ -203,7 +203,7 @@ export default function HomePage() {
           <code style={{ color: "#34d399", fontSize: ".88em" }}>ui.html</code> in seconds.
         </p>
 
-        {/* ── INLINE CHAT — centered, full width capped ───────────── */}
+        {/* INLINE CHAT — centered, full width capped */}
         <div
           className="su"
           style={{
@@ -307,7 +307,7 @@ export default function HomePage() {
 </div>
       </main>
 
-      {/* ── FOOTER ──────────────────────────────────────────────────── */}
+      {/* FOOTER */}
       <footer
         style={{
           position: "relative",
@@ -325,7 +325,7 @@ export default function HomePage() {
   );
 }
 
-/* ── small sub-components ───────────────────────────────────────────────── */
+/*  small sub-components */
 function ExChip({ label }: { label: string }) {
   return (
     <button

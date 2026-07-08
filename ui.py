@@ -20,13 +20,13 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .stDeployButton { display: none; }
 section[data-testid="stSidebar"] { display: none; }
 
-/* ── Page shell ── */
+/* Page shell  */
 .block-container {
     max-width: 1200px !important;
     padding: 0 2rem 3rem !important;
 }
 
-/* ── Top nav ── */
+/* Top nav  */
 .forge-nav {
     display: flex;
     align-items: center;
@@ -62,7 +62,7 @@ section[data-testid="stSidebar"] { display: none; }
     padding: 2px 7px;
 }
 
-/* ── Section labels ── */
+/* Section labels */
 .eyebrow {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.68rem;
@@ -79,7 +79,7 @@ section[data-testid="stSidebar"] { display: none; }
     letter-spacing: -0.02em;
     margin-bottom: 1rem;
 }
-/* ── Fix cursor visibility in textarea ── */
+/* Fix cursor visibility in textarea */
 .stTextArea textarea {
     caret-color: #1a1a2e !important;   /* makes cursor visible */
 }
@@ -95,7 +95,7 @@ section[data-testid="stSidebar"] { display: none; }
 textarea {
     color: #1a1a2e !important;
 }
-/* ── Textarea ── */
+/* Textarea */
 .stTextArea textarea {
     background: #ffffff !important;
     border: 1.5px solid #e4e4dc !important;
@@ -116,7 +116,7 @@ textarea {
 .stTextArea label { display: none !important; }
 .stTextArea textarea::placeholder { color: #b0b0c0 !important; }
 
-/* ── Primary button ── */
+/* Primary button */
 .stButton > button[kind="primary"] {
     background: #1a1a2e !important;
     border: none !important;
@@ -138,7 +138,7 @@ textarea {
     transform: translateY(0) !important;
 }
 
-/* ── Secondary button ── */
+/* Secondary button*/
 .stButton > button:not([kind="primary"]) {
     background: #ffffff !important;
     border: 1.5px solid #e4e4dc !important;
@@ -153,7 +153,7 @@ textarea {
     color: #1a1a2e !important;
 }
 
-/* ── Divider ── */
+/* Divider */
 .col-divider {
     width: 1px;
     background: #e4e4dc;
@@ -161,7 +161,7 @@ textarea {
     margin: 0 0.5rem;
 }
 
-/* ── Output card ── */
+/* Output card */
 .output-card {
     background: #ffffff;
     border: 1.5px solid #e4e4dc;
@@ -221,7 +221,7 @@ textarea {
     0%,100% { opacity:1; } 50% { opacity:0.25; }
 }
 
-/* ── Tabs ── */
+/* Tabs */
 .stTabs [data-baseweb="tab-list"] {
     background: transparent !important;
     border-bottom: 1px solid #e4e4dc !important;
@@ -247,7 +247,7 @@ textarea {
     padding: 1.2rem 1.2rem !important;
 }
 
-/* ── Radio ── */
+/* Radio  */
 div[data-testid="stRadio"] > label { display: none !important; }
 .stRadio [data-baseweb="radio-group"] {
     gap: 5px !important;
@@ -270,7 +270,7 @@ div[data-testid="stRadio"] > label { display: none !important; }
     color: #ffffff !important;
 }
 
-/* ── Code ── */
+/* Code */
 .stCode, [data-testid="stCode"] {
     border-radius: 8px !important;
     border: 1px solid #e4e4dc !important;
@@ -281,7 +281,7 @@ div[data-testid="stRadio"] > label { display: none !important; }
     font-size: 0.8rem !important;
 }
 
-/* ── Download buttons ── */
+/*Download buttons*/
 .stDownloadButton > button {
     background: #fafaf8 !important;
     border: 1.5px solid #e4e4dc !important;
@@ -298,7 +298,7 @@ div[data-testid="stRadio"] > label { display: none !important; }
     background: #ffffff !important;
 }
 
-/* ── Example chips ── */
+/*  Example chips */
 .chip-row {
     display: flex;
     flex-wrap: wrap;
@@ -315,7 +315,7 @@ div[data-testid="stRadio"] > label { display: none !important; }
     white-space: nowrap;
 }
 
-/* ── Empty state ── */
+/* Empty state  */
 .empty-wrap {
     padding: 3.5rem 1rem;
     text-align: center;
@@ -323,7 +323,7 @@ div[data-testid="stRadio"] > label { display: none !important; }
 .empty-icon { font-size: 2rem; margin-bottom: 0.8rem; opacity: 0.25; }
 .empty-msg { font-size: 0.85rem; color: #c0c0d0; }
 
-/* ── Alert overrides ── */
+/* Alert overrides */
 .stAlert > div {
     border-radius: 8px !important;
     font-size: 0.85rem !important;
@@ -367,10 +367,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Two-column layout ────────────────────────────────────────────
+# Two-column layout
 left, gap_col, right = st.columns([5, 0.15, 7], gap="small")
 
-# ── LEFT: Input panel ────────────────────────────────────────────
+# LEFT: Input panel 
 with left:
     st.markdown('<div class="eyebrow">// Build</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-heading">Describe your agent</div>', unsafe_allow_html=True)
@@ -599,7 +599,7 @@ if "agent_result" in st.session_state:
 
             st.markdown('</div>', unsafe_allow_html=True)
 
-# ── Agent Library ────────────────────────────────────────────────────────────
+# ── Agent Library 
 st.markdown("<hr style='border:none;border-top:1px solid #e4e4dc;margin:2.5rem 0 1.8rem'>",
             unsafe_allow_html=True)
 st.markdown('<div class="eyebrow">// Library</div>', unsafe_allow_html=True)

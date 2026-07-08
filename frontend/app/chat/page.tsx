@@ -216,7 +216,7 @@ export default function ChatPage() {
         animation: "breathe 8s ease-in-out infinite",
       }} aria-hidden />
 
-      {/* ── SIDEBAR ─────────────────────────────────────────────────── */}
+      {/* SIDEBAR */}
       <aside
         style={{
           width: sidebar ? 230 : 0,
@@ -329,7 +329,7 @@ export default function ChatPage() {
         </div>
       </aside>
 
-      {/* ── MAIN CHAT ───────────────────────────────────────────────── */}
+      {/*  MAIN CHAT  */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", zIndex: 10, minWidth: 0 }}>
 
         {/* top bar */}

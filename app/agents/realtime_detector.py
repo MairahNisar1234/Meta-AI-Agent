@@ -676,15 +676,15 @@ def realtime_detector_node(state: dict) -> dict:
     print(f"[realtime_detector] Detected category : {category}")
     print(f"[realtime_detector] API               : {api_config['name']}")
 
-    # ── Resolve the GENERATED AGENT's .env path (never project root) ─────────
+    # Resolve the GENERATED AGENT's .env path 
     agent_env_path = _resolve_agent_env_path(state)
     print(f"[realtime_detector] Writing .env to   : {agent_env_path}")
 
-    # ── Patch the generated agent's .env ─────────────────────────────────────
+    # Patch the generated agent's .env 
     written_vars = patch_agent_env_file(category, api_config, agent_env_path)
     print(f"[realtime_detector] Wrote vars        : {list(written_vars.keys())}")
 
-    # ── Build realtime_config for coder_node ─────────────────────────────────
+    #  Build realtime_config for coder_node
     realtime_config = {
         "category":         category,
         "api_name":         api_config["name"],
@@ -703,7 +703,7 @@ def realtime_detector_node(state: dict) -> dict:
         "tool_template":    REALTIME_REGISTRY[category].get("tool_template", ""),
     }
 
-    # ── Build the endpoints listing for the instruction block ────────────────
+    #  Build the endpoints listing for the instruction block
     endpoints = api_config.get("endpoints")
     if endpoints:
         endpoints_block = "\n".join(
@@ -713,7 +713,7 @@ def realtime_detector_node(state: dict) -> dict:
     else:
         endpoints_block = f"Live endpoint  : {api_config['live_scores']}"
 
-    # ── Build instruction block for coder_node ────────────────────────────────
+    # Build instruction block for coder_node 
     realtime_instruction = f"""
 
 === REAL-TIME DATA REQUIREMENTS (auto-detected) ===
@@ -744,7 +744,7 @@ IMPORTANT RULES FOR GENERATED agent.py:
 === END REAL-TIME DATA REQUIREMENTS ===
 """
 
-    # ── Augment spec — PRESERVING ORIGINAL TYPE ──────────────────────────────
+    # Augment spec — PRESERVING ORIGINAL TYPE
     augmented_spec = _augment_spec(original_spec, realtime_instruction)
     print("[realtime_detector] Spec augmented — type preserved.")
 
@@ -755,9 +755,8 @@ IMPORTANT RULES FOR GENERATED agent.py:
     }
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# STANDALONE TEST  (python -m app.agents.realtime_detector)
-# ─────────────────────────────────────────────────────────────────────────────
+
+# STANDALONE TEST  (python -m app.agents.realtime_detector
 
 if __name__ == "__main__":
     test_cases = [

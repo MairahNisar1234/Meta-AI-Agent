@@ -14,7 +14,7 @@ export interface GeneratedFile {
   size: number;
 }
 
-// ── Streaming event types ─────────────────────────────────────────────────
+//  Streaming event types 
 export type StreamEvent =
   | { type: "token";         content: string }
   | { type: "tool_start";    tool: string }
@@ -24,7 +24,7 @@ export type StreamEvent =
   | { type: "done" }
   | { type: "error";         detail: string };
 
-// ── Stream chat with SSE ──────────────────────────────────────────────────
+// Stream chat with SSE 
 export async function streamChat(
   request: ChatRequest,
   onEvent: (event: StreamEvent) => void,
@@ -69,7 +69,7 @@ export async function streamChat(
   }
 }
 
-// ── Health check ──────────────────────────────────────────────────────────
+// Health check 
 export async function checkHealth(): Promise<boolean> {
   try {
     const res = await fetch(`${API_BASE}/health`, { cache: "no-store" });
@@ -79,7 +79,7 @@ export async function checkHealth(): Promise<boolean> {
   }
 }
 
-// ── Download a generated file ─────────────────────────────────────────────
+// Download a generated file 
 export function getDownloadUrl(agentName: string, filename: string): string {
   return `${API_BASE}/download/${encodeURIComponent(agentName)}/${encodeURIComponent(filename)}`;
 }

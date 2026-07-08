@@ -143,7 +143,7 @@ def coder_node(state: AgentState) -> dict:
     else:
         agent_name = "<agent_name>"
 
-    # ── DB lookup — load previous version as reference if it exists ──────────
+    # DB lookup — load previous version as reference if it exists 
     prior_code_context = ""
     try:
         existing = get_agent_by_canonical_name(agent_name)

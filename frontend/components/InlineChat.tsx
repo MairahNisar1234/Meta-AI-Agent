@@ -6,7 +6,7 @@ import {
 } from "react";
 import { streamChat, getDownloadUrl, type StreamEvent, type GeneratedFile } from "@/lib/api";
 
-/* ── markdown ────────────────────────────────────────────────────────────── */
+/* markdown  */
 function md(text: string) {
   return text
     .replace(/^### (.+)$/gm, "<h3>$1</h3>")
@@ -16,7 +16,7 @@ function md(text: string) {
     .replace(/\n/g, "<br />");
 }
 
-/* ── types ───────────────────────────────────────────────────────────────── */
+/*  types */
 interface Msg {
   id: string;
   role: "user" | "agent";
@@ -38,7 +38,7 @@ Tell me what kind of agent you want and I'll generate the full \`agent.py\`, \`.
 - Create a stock price assistant
 - Make a mental health support chatbot`;
 
-/* ── file icon map ───────────────────────────────────────────────────────── */
+/*  file icon map */
 const FILE_ICONS: Record<string, string> = {
   "agent.py": "🐍",
   ".env":     "🔑",
@@ -50,7 +50,7 @@ const FILE_DESC: Record<string, string> = {
   "ui.html":  "Ready-to-use browser UI",
 };
 
-/* ── DownloadCard ────────────────────────────────────────────────────────── */
+/* Download */
 function DownloadCard({ agentName, files }: { agentName: string; files: GeneratedFile[] }) {
   return (
     <div style={{
@@ -113,7 +113,7 @@ function DownloadCard({ agentName, files }: { agentName: string; files: Generate
   );
 }
 
-/* ── component ───────────────────────────────────────────────────────────── */
+/* component*/
 export default function InlineChat() {
   const [msgs,   setMsgs]   = useState<Msg[]>([{ id: uid(), role: "agent", content: GREETING }]);
   const [input,  setInput]  = useState("");
@@ -241,7 +241,7 @@ export default function InlineChat() {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
   };
 
-  /* ── render ─────────────────────────────────────────────────────────── */
+  /*render*/
   return (
     <div
       className="glass"
@@ -253,7 +253,7 @@ export default function InlineChat() {
         boxShadow: "0 0 0 1px rgba(130,80,255,.2), 0 20px 56px rgba(60,20,180,.22), 0 4px 16px rgba(0,0,0,.3)",
       }}
     >
-      {/* ── HEADER ──────────────────────────────────────────────────── */}
+      {/* HEADER */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "12px 16px",
@@ -286,7 +286,7 @@ export default function InlineChat() {
         </div>
       </div>
 
-      {/* ── PROGRESS BAR ────────────────────────────────────────────── */}
+      {/* PROGRESS BAR */}
       {busy && (
         <div className="fi" style={{
           padding: "6px 16px",
@@ -308,7 +308,7 @@ export default function InlineChat() {
         </div>
       )}
 
-      {/* ── MESSAGES ────────────────────────────────────────────────── */}
+      {/* MESSAGES */}
       <div style={{
         overflowY: "auto",
         display: "flex",
@@ -345,7 +345,7 @@ export default function InlineChat() {
         <div ref={bottomRef} />
       </div>
 
-      {/* ── INPUT ───────────────────────────────────────────────────── */}
+      {/*INPUT */}
       <div style={{ padding: "10px 12px 14px", borderTop: "1px solid var(--border)" }}>
         <div style={{
           display: "flex", alignItems: "flex-end", gap: 8,
