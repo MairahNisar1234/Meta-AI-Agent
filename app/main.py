@@ -96,10 +96,7 @@ def _build_agent_result(result: dict) -> dict:
         "task_type": getattr(spec, "task_type", "unknown") if spec else "unknown",
     }
 
-
-# ---------------------------------------------------------------------------
 # Routes
-# ---------------------------------------------------------------------------
 
 @app.get("/health")
 async def health_check():
