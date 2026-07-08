@@ -1,82 +1,75 @@
 """
 persistence.py
 
-Drop-in persistence layer for the meta-agent system.
+Drop-in persistence layer for the meta-agent system — MongoDB edition.
 
 What it does:
-- Stores metadata about every generated agent in SQLite (agents.db)
+- Stores metadata about every generated agent in MongoDB (db: meta_agents, collection: agents)
 - Keeps the actual generated code on disk under agent_registry/<name>__<agent_id>/v<n>/
   (deliberately separate from your pipeline's working "generated_agents/" folder)
-- Tracks version history so re-generating/iterating on an agent doesn't destroy the old one
+- Tracks version history (embedded as an array on the agent document) so
+  re-generating/iterating on an agent doesn't destroy the old one
 - Survives restarts: on startup just call init_db() and everything is there
 
 Drop this file next to your pipeline code (e.g. alongside supervisor.py) and import it
 from wherever runtime_check succeeds.
+
+Requires: pip install pymongo
+Configure connection via the MONGO_URI env var (defaults to a local instance).
 """
 
-import sqlite3
 import shutil
 import uuid
-import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from contextlib import contextmanager
 
-DB_PATH = Path("agents.db")
+from pymongo import MongoClient, ReturnDocument
+
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("META_AGENT_DB_NAME", "meta_agents")
+
 # IMPORTANT: this must NOT be the same folder your pipeline writes live agents
 # into (settings.generated_agents_dir, typically "generated_agents/"). This is
 # a separate, permanent archive — keep it distinct or you'll get the pipeline's
 # working copy and the persisted copy tangled together in one folder.
 STORAGE_ROOT = Path("agent_registry")
 
+_client: MongoClient | None = None
+
 
 # ---------------------------------------------------------------------------
 # Setup
 # ---------------------------------------------------------------------------
 
-@contextmanager
-def get_conn():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    try:
-        yield conn
-        conn.commit()
-    finally:
-        conn.close()
+def get_client() -> MongoClient:
+    global _client
+    if _client is None:
+        _client = MongoClient(MONGO_URI)
+    return _client
+
+
+def get_db():
+    return get_client()[DB_NAME]
+
+
+def _agents_collection():
+    return get_db()["agents"]
 
 
 def init_db():
+    """Create the storage folder and required indexes. Safe to call repeatedly."""
     STORAGE_ROOT.mkdir(exist_ok=True)
-    with get_conn() as conn:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS agents (
-                id TEXT PRIMARY KEY,
-                canonical_name TEXT NOT NULL,
-                display_name TEXT,
-                original_prompt TEXT,
-                category TEXT,             -- cricket, stocks, weather, news, sports_general, currency, none
-                current_version INTEGER DEFAULT 1,
-                status TEXT DEFAULT 'active',   -- active | archived | failed
-                metadata_json TEXT,        -- anything extra: api config, model used, etc.
-                created_at TEXT,
-                updated_at TEXT
-            )
-        """)
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS agent_versions (
-                agent_id TEXT NOT NULL,
-                version INTEGER NOT NULL,
-                code_path TEXT NOT NULL,
-                prompt_used TEXT,           -- the prompt/instruction that produced this version
-                validation_status TEXT,     -- passed | failed
-                created_at TEXT,
-                PRIMARY KEY (agent_id, version),
-                FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE
-            )
-        """)
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_agents_category ON agents(category)")
+    col = _agents_collection()
+    # _id is used as the agent_id (string), so no separate id index needed.
+    col.create_index("canonical_name")
+    col.create_index("category")
+    col.create_index("status")
+    col.create_index([("canonical_name", 1), ("status", 1), ("updated_at", -1)])
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 # ---------------------------------------------------------------------------
@@ -102,26 +95,33 @@ def save_agent(
     Returns the new agent_id.
     """
     agent_id = str(uuid.uuid4())[:8]
-    now = datetime.utcnow().isoformat()
+    now = _now()
     dest = STORAGE_ROOT / f"{canonical_name}__{agent_id}" / "v1"
     dest.mkdir(parents=True, exist_ok=True)
     _copy_agent_files(source_code_dir, dest)
 
-    with get_conn() as conn:
-        conn.execute(
-            """INSERT INTO agents
-               (id, canonical_name, display_name, original_prompt, category,
-                current_version, status, metadata_json, created_at, updated_at)
-               VALUES (?, ?, ?, ?, ?, 1, 'active', ?, ?, ?)""",
-            (agent_id, canonical_name, display_name, original_prompt, category,
-             json.dumps(metadata or {}), now, now),
-        )
-        conn.execute(
-            """INSERT INTO agent_versions
-               (agent_id, version, code_path, prompt_used, validation_status, created_at)
-               VALUES (?, 1, ?, ?, ?, ?)""",
-            (agent_id, str(dest), original_prompt, validation_status, now),
-        )
+    doc = {
+        "_id": agent_id,
+        "canonical_name": canonical_name,
+        "display_name": display_name,
+        "original_prompt": original_prompt,
+        "category": category,
+        "current_version": 1,
+        "status": "active",
+        "metadata": metadata or {},
+        "created_at": now,
+        "updated_at": now,
+        "versions": [
+            {
+                "version": 1,
+                "code_path": str(dest),
+                "prompt_used": original_prompt,
+                "validation_status": validation_status,
+                "created_at": now,
+            }
+        ],
+    }
+    _agents_collection().insert_one(doc)
     return agent_id
 
 
@@ -137,31 +137,33 @@ def save_new_version(
 
     Returns the new version number.
     """
-    with get_conn() as conn:
-        row = conn.execute(
-            "SELECT current_version, canonical_name FROM agents WHERE id = ?", (agent_id,)
-        ).fetchone()
-        if row is None:
-            raise ValueError(f"No agent with id {agent_id}")
-        new_version = row["current_version"] + 1
-        canonical_name = row["canonical_name"]
+    col = _agents_collection()
+    row = col.find_one({"_id": agent_id}, {"current_version": 1, "canonical_name": 1})
+    if row is None:
+        raise ValueError(f"No agent with id {agent_id}")
+
+    new_version = row["current_version"] + 1
+    canonical_name = row["canonical_name"]
 
     dest = STORAGE_ROOT / f"{canonical_name}__{agent_id}" / f"v{new_version}"
     dest.mkdir(parents=True, exist_ok=True)
     _copy_agent_files(source_code_dir, dest)
 
-    now = datetime.utcnow().isoformat()
-    with get_conn() as conn:
-        conn.execute(
-            """INSERT INTO agent_versions
-               (agent_id, version, code_path, prompt_used, validation_status, created_at)
-               VALUES (?, ?, ?, ?, ?, ?)""",
-            (agent_id, new_version, str(dest), prompt_used, validation_status, now),
-        )
-        conn.execute(
-            "UPDATE agents SET current_version = ?, updated_at = ? WHERE id = ?",
-            (new_version, now, agent_id),
-        )
+    now = _now()
+    version_entry = {
+        "version": new_version,
+        "code_path": str(dest),
+        "prompt_used": prompt_used,
+        "validation_status": validation_status,
+        "created_at": now,
+    }
+    col.update_one(
+        {"_id": agent_id},
+        {
+            "$push": {"versions": version_entry},
+            "$set": {"current_version": new_version, "updated_at": now},
+        },
+    )
     return new_version
 
 
@@ -172,50 +174,24 @@ def get_agent_by_canonical_name(canonical_name: str, status: str = "active") -> 
     an existing one) — without this check every regeneration creates a
     fresh duplicate row instead of a new version of the same agent.
     """
-    with get_conn() as conn:
-        row = conn.execute(
-            "SELECT * FROM agents WHERE canonical_name = ? AND status = ? "
-            "ORDER BY updated_at DESC LIMIT 1",
-            (canonical_name, status),
-        ).fetchone()
-        if row is None:
-            return None
-        agent = dict(row)
-        agent["metadata"] = json.loads(agent.pop("metadata_json") or "{}")
-        return agent
+    doc = _agents_collection().find_one(
+        {"canonical_name": canonical_name, "status": status},
+        sort=[("updated_at", -1)],
+    )
+    return _with_id(doc)
 
 
 def get_agent(agent_id: str) -> dict | None:
-    with get_conn() as conn:
-        row = conn.execute("SELECT * FROM agents WHERE id = ?", (agent_id,)).fetchone()
-        if row is None:
-            return None
-        agent = dict(row)
-        agent["metadata"] = json.loads(agent.pop("metadata_json") or "{}")
-        versions = conn.execute(
-            "SELECT version, code_path, prompt_used, validation_status, created_at "
-            "FROM agent_versions WHERE agent_id = ? ORDER BY version",
-            (agent_id,),
-        ).fetchall()
-        agent["versions"] = [dict(v) for v in versions]
-        return agent
+    doc = _agents_collection().find_one({"_id": agent_id})
+    return _with_id(doc)
 
 
 def list_agents(category: str | None = None, status: str = "active") -> list[dict]:
-    query = "SELECT * FROM agents WHERE status = ?"
-    params = [status]
+    query = {"status": status}
     if category:
-        query += " AND category = ?"
-        params.append(category)
-    query += " ORDER BY updated_at DESC"
-    with get_conn() as conn:
-        rows = conn.execute(query, params).fetchall()
-        out = []
-        for r in rows:
-            a = dict(r)
-            a["metadata"] = json.loads(a.pop("metadata_json") or "{}")
-            out.append(a)
-        return out
+        query["category"] = category
+    cursor = _agents_collection().find(query).sort("updated_at", -1)
+    return [_with_id(doc) for doc in cursor]
 
 
 def get_active_code_path(agent_id: str) -> str | None:
@@ -227,17 +203,14 @@ def get_active_code_path(agent_id: str) -> str | None:
 
 
 def archive_agent(agent_id: str):
-    with get_conn() as conn:
-        conn.execute(
-            "UPDATE agents SET status = 'archived', updated_at = ? WHERE id = ?",
-            (datetime.utcnow().isoformat(), agent_id),
-        )
+    _agents_collection().update_one(
+        {"_id": agent_id},
+        {"$set": {"status": "archived", "updated_at": _now()}},
+    )
 
 
 def delete_agent(agent_id: str, remove_files: bool = True):
-    with get_conn() as conn:
-        conn.execute("DELETE FROM agent_versions WHERE agent_id = ?", (agent_id,))
-        conn.execute("DELETE FROM agents WHERE id = ?", (agent_id,))
+    _agents_collection().delete_one({"_id": agent_id})
     if remove_files:
         for folder in STORAGE_ROOT.glob(f"*__{agent_id}"):
             shutil.rmtree(folder, ignore_errors=True)
@@ -246,6 +219,15 @@ def delete_agent(agent_id: str, remove_files: bool = True):
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+def _with_id(doc: dict | None) -> dict | None:
+    """Rename Mongo's `_id` to `id` so callers see the same shape as before."""
+    if doc is None:
+        return None
+    doc = dict(doc)
+    doc["id"] = doc.pop("_id")
+    return doc
+
 
 def _copy_agent_files(source_dir: str, dest_dir: Path):
     """Copy generated agent files, skipping junk like __pycache__ and venvs."""
